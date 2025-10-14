@@ -1,352 +1,253 @@
-import requests
-from datetime import datetime, date
-import time
-import pandas as pd
-import re
-from bs4 import BeautifulSoup
-import json
-import os # Para salvar o arquivo
-
-# =================================================================
-# 🔧 CONFIGURAÇÕES
-# =================================================================
-
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-    "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8"
-}
-
-# =================================================================
-# 🎯 FUNÇÕES DE BUSCA REAIS DO DOU (As suas funções)
-# =================================================================
-
-def buscar_dou_json_embedded(nome, data_inicio, data_fim):
-    """ Busca no DOU extraindo JSON embutido na página - MÉTODO PRINCIPAL """
-    url = "https://www.in.gov.br/consulta/-/buscar/dou"
-    
-    params = {
-        "q": f'"{nome}"',
-        "s": "todos",
-        "exactDate": "personalizado",
-        "sortType": "0",
-        "publishFrom": data_inicio.strftime("%d-%m-%Y"),
-        "publishTo": data_fim.strftime("%d-%m-%Y")
-    }
-    
-    print(f"[INFO] Tentando buscar JSON embutido para {nome}...")
-    try:
-        response = requests.get(url, params=params, headers=HEADERS, timeout=30)
-        
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.content, 'html.parser')
-            script_tag = soup.find('script', id='_br_com_seatecnologia_in_buscadou_BuscaDouPortlet_params')
-            
-            if script_tag and script_tag.string:
-                try:
-                    json_text = script_tag.string.strip()
-                    dados = json.loads(json_text)
-                    items = dados.get('jsonArray', [])
-                    
-                    if items:
-                        print(f"  [SUCESSO] {len(items)} resultados via JSON embutido.")
-                        return processar_items_json(items, nome)
-                    else:
-                        print(f"  [AVISO] JSON vazio encontrado. Tentando HTML...")
-                        
-                except json.JSONDecodeError as e:
-                    print(f"  [ERRO] Falha ao decodificar JSON: {e}. Tentando HTML...")
-            
-            # Tentar extrair do HTML se o JSON falhar ou não existir
-            print(f"  [INFO] Tentando extrair resultados do HTML...")
-            return extrair_resultados_html_direct(response.text, nome)
-            
-        else:
-            print(f"  [ERRO] Erro HTTP {response.status_code}. Tentando HTML...")
-            
-    except Exception as e:
-        print(f"  [ERRO] Erro na busca (JSON): {e}. Voltando para HTML simples...")
-    
-    return []
-
-# ----------------------------------------------------------------------
-# O código continua com as suas funções auxiliares e a função de processamento:
-# ----------------------------------------------------------------------
-
-def processar_items_json(items, nome_busca):
-    # ... (Sua função processar_items_json inalterada)
-    resultados = []
-    
-    for item in items:
-        conteudo = item.get('content', '')
-        titulo = item.get('title', '')
-        data_pub = item.get('pubDate', '')
-        url = item.get('url', '')
-        hierarchy = item.get('hierarchyList', [])
-        pub_name = item.get('pubName', '')
-        
-        tipo = identificar_tipo_publicacao(titulo, conteudo, nome_busca)
-        
-        resultados.append({
-            'Nome Buscado': nome_busca,
-            'Título': titulo,
-            'Data': formatar_data(data_pub),
-            'Tipo': tipo,
-            'Órgão': hierarchy[-1] if hierarchy else "Órgão não identificado",
-            'URL': f"https://www.in.gov.br{url}" if url and not url.startswith('http') else url,
-            'Seção': pub_name,
-            'Trecho Relevante': extrair_trecho_relevante(conteudo, nome_busca),
-            'Cargo': extrair_cargo(conteudo),
-            'Nome na Pub.': extrair_nome_publicacao(conteudo, nome_busca),
-        })
-    return resultados
-
-def extrair_resultados_html_direct(html_content, nome_busca):
-    # ... (Sua função extrair_resultados_html_direct inalterada)
-    soup = BeautifulSoup(html_content, 'html.parser')
-    resultados = []
-    
-    resultados_divs = soup.find_all(['div', 'li'], class_=['search-result', 'resultado', 'item-busca']) 
-    
-    if not resultados_divs:
-        resultados_divs = soup.find_all('div', class_=lambda x: x and 'resultado' in x)
-
-    for div in resultados_divs:
-        try:
-            titulo_elem = div.find(['h2', 'h3'], class_=lambda x: x and ('title' in x or 'titulo' in x))
-            if not titulo_elem:
-                 link_elem = div.find('a', string=lambda t: t and nome_busca.upper() in t.upper())
-                 titulo = link_elem.get_text(strip=True) if link_elem else "Sem título"
-                 url = link_elem.get('href', '') if link_elem else ''
-            else:
-                 link_elem = titulo_elem.find('a')
-                 titulo = titulo_elem.get_text(strip=True) if titulo_elem else "Sem título"
-                 url = link_elem.get('href', '') if link_elem else ''
-
-            if titulo == "Sem título" or nome_busca.upper() not in titulo.upper():
-                continue
-
-            conteudo_elem = div.find(['p', 'div', 'span'], class_=lambda x: x and ('abstract' in x or 'content' in x or 'trecho' in x))
-            conteudo = conteudo_elem.get_text(strip=True) if conteudo_elem else div.get_text(strip=True) 
-            
-            data_elem = div.find(['span', 'p', 'div'], class_=lambda x: x and ('date' in x or 'data-publicacao' in x))
-            data = data_elem.get_text(strip=True) if data_elem else ''
-            
-            orgao = "Órgão não identificado (HTML)"
-            if ':' in titulo:
-                 orgao = titulo.split(':')[0].strip()
-
-            tipo = identificar_tipo_publicacao(titulo, conteudo, nome_busca)
-            
-            resultados.append({
-                'Nome Buscado': nome_busca,
-                'Título': titulo,
-                'Data': formatar_data(data),
-                'Tipo': tipo,
-                'Órgão': orgao,
-                'URL': f"https://www.in.gov.br{url}" if url and not url.startswith('http') else url,
-                'Seção': "Seção não definida (HTML)",
-                'Trecho Relevante': extrair_trecho_relevante(conteudo, nome_busca),
-                'Cargo': extrair_cargo(conteudo),
-                'Nome na Pub.': extrair_nome_publicacao(conteudo, nome_busca),
-            })
-                
-        except Exception as e:
-             continue
-    
-    print(f"  [AVISO] {len(resultados)} resultados via HTML (Fallback).")
-    return resultados
-
-# ----------------------------------------------------------------------
-# Suas funções auxiliares...
-# ----------------------------------------------------------------------
-
-def identificar_tipo_publicacao(titulo, conteudo, nome_busca):
-    # (Manter sua lógica de identificação de tipo)
-    texto = f"{titulo} {conteudo}".upper()
-    
-    if 'PORTARIA' in titulo.upper():
-        if any(palavra in texto for palavra in ['NOMEAR', 'NOMEAÇÃO', 'POSSE']):
-            return "NOMEAÇÃO"
-        elif any(palavra in texto for palavra in ['DESIGNAR', 'DISPENSAR']):
-            return "DESIGNAÇÃO"
-        else:
-            return "PORTARIA"
-    
-    if 'EDITAL' in titulo.upper():
-        if 'CONCURSO' in texto:
-            return "EDITAL CONCURSO"
-        else:
-            return "EDITAL"
-    
-    if any(palavra in texto for palavra in ['NOMEAR', 'NOMEAÇÃO', 'POSSE']):
-        return "NOMEAÇÃO"
-    elif any(palavra in texto for palavra in ['APROVADO', 'CLASSIFICADO', 'RESULTADO FINAL']):
-        return "APROVADO"
-    elif any(palavra in texto for palavra in ['CONVOCAR', 'CONVOCAÇÃO']):
-        return "CONVOCADO"
-    elif 'CONCURSO PÚBLICO' in texto:
-        return "CONCURSO PÚBLICO"
-    
-    return "OUTROS"
-
-def extrair_cargo(conteudo):
-    padroes = [
-        r'cargo de\s+([^,\.]+)', r'cargo:\s*([^\n\.]+)', r'para o cargo de\s+([^,\.]+)', 
-        r'função de\s+([^,\.]+)', r'encargo de\s+([^,\.]+)'
-    ]
-    for padrao in padroes:
-        match = re.search(padrao, conteudo, re.IGNORECASE)
-        if match:
-            cargo = match.group(1).strip()
-            cargo = re.sub(r'^(de|para|como|,|\.)', '', cargo, flags=re.IGNORECASE).strip()
-            if cargo and len(cargo) > 3:
-                return cargo
-    return "Não identificado"
-
-def extrair_trecho_relevante(conteudo, nome_busca):
-    try:
-        padrao = re.escape(nome_busca)
-        match = re.search(padrao, conteudo, re.IGNORECASE)
-        if match:
-            inicio = max(0, match.start() - 100)
-            fim = min(len(conteudo), match.end() + 100)
-            trecho = conteudo[inicio:fim]
-            trecho_destacado = re.sub(padrao, f"<b>{match.group()}</b>", trecho, flags=re.IGNORECASE)
-            return f"...{trecho_destacado}..."
-    except:
-        pass
-    return conteudo[:200] + "..." if len(conteudo) > 200 else conteudo
-
-def extrair_nome_publicacao(conteudo, nome_busca):
-    try:
-        padrao = re.escape(nome_busca)
-        match = re.search(padrao, conteudo, re.IGNORECASE)
-        return match.group() if match else nome_busca
-    except:
-        return nome_busca
-
-def formatar_data(data_string):
-    if not data_string: return "N/A"
-    try:
-        for fmt in ["%Y-%m-%d", "%d/%m/%Y", "%d-%m-%Y"]:
-            try:
-                if len(data_string) >= 10:
-                    data_obj = datetime.strptime(data_string[:10], fmt)
-                    return data_obj.strftime("%d/%m/%Y")
-            except ValueError:
-                continue
-    except:
-        pass
-    return data_string
-
-# ----------------------------------------------------------------------
-# FUNÇÃO PRINCIPAL: Gera o Arquivo HTML
-# ----------------------------------------------------------------------
-
-def gerar_html_dos_resultados(nome, data_inicio, data_fim, arquivo_saida="resultados_dou.html"):
-    """
-    Executa a busca e gera um arquivo HTML estático com a tabela de resultados.
-    """
-    print("=================================================================")
-    print(f"🚀 INICIANDO BUSCA DOU para: {nome}")
-    print(f"📅 Período: {data_inicio.strftime('%d/%m/%Y')} a {data_fim.strftime('%d/%m/%Y')}")
-    print("=================================================================")
-    
-    # 1. Executa a busca
-    resultados = buscar_dou_json_embedded(nome, data_inicio, data_fim)
-    
-    if not resultados:
-        print("❌ NENHUM RESULTADO ENCONTRADO.")
-        return
-
-    # 2. Cria o DataFrame
-    df = pd.DataFrame(resultados)
-    
-    # Colunas que queremos exibir na tabela
-    df_html = df[[
-        'Nome Buscado', 'Tipo', 'Data', 'Órgão', 'Cargo', 'Título', 'Trecho Relevante', 'URL'
-    ]]
-    
-    # 3. Formatação HTML e CSS simples (para deixar bonito)
-    
-    # Adiciona links na coluna URL
-    df_html['URL'] = df_html['URL'].apply(lambda x: f'<a href="{x}" target="_blank">Acessar</a>')
-    
-    # Estilos CSS
-    css_style = """
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio ECOENG Solidário & Corrente do Bem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: A single-page, vertical scrolling application with a fixed top navigation bar for easy access to different thematic sections. The structure is designed to tell a story: 1) Hero section to grab attention and introduce the challenge. 2) A section introducing the partner NGO and its mission. 3) A core interactive section where users can click on different recyclables to see their direct social impact, making the connection tangible. 4) An inspirational section covering the NGO's philosophy and broader impact. 5) A clear, actionable final section detailing how to participate. This narrative flow is more engaging and exploratory than a static card-based layout, guiding the user from awareness to action while allowing non-linear exploration via the nav bar. -->
+    <!-- Visualization & Content Choices: Report Info: Recycling outcomes (Card 3) -> Goal: Engage/Inform -> Viz/Presentation: Interactive tabbed component (HTML/CSS/JS) -> Interaction: User clicks on a recyclable type (e.g., 'Plásticos') and a display area dynamically updates with the corresponding outcome (e.g., 'Cestas Básicas'). Justification: This transforms a static list into an engaging discovery tool, directly connecting user action with social good. | Report Info: NGO services (Card 2) & Impact (Card 5) -> Goal: Inform/Organize -> Viz/Presentation: Styled lists and grid layouts with Unicode icons (HTML/Tailwind CSS). Justification: This visually organizes qualitative information for quick comprehension without needing complex charts. The focus is on interactive HTML elements over data-driven charts, as the source material is primarily qualitative and narrative-based. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
-        h1 { color: #004d99; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1); background-color: white; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #007bff; color: white; cursor: pointer; }
-        tr:hover { background-color: #f1f1f1; }
-        .success { color: green; font-weight: bold; }
-        .info { color: #555; }
-        /* Ajuste de largura das colunas importantes */
-        td:nth-child(6) { max-width: 400px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        td:nth-child(7) { max-width: 500px; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #E58A80;
+        }
+        .cta-button {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            background-color: #D4756A;
+        }
+        .recyclable-btn {
+            transition: all 0.3s ease;
+        }
+        .recyclable-btn.active {
+            background-color: #6B8E23;
+            color: #FFFFFF;
+            transform: scale(1.05);
+        }
     </style>
-    """
-    
-    # Gera o HTML da tabela (sem index e com a classe 'dataframe')
-    tabela_html = df_html.to_html(escape=False, index=False, classes='dataframe')
-    
-    # HTML Final
-    html_output = f"""
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Resultados DOU - {nome}</title>
-        {css_style}
-        <script>
-            // Script para permitir a ordenação da tabela (opcional, mas útil)
-            document.addEventListener('DOMContentLoaded', () => {{
-                const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
-                const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
-                    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
-                )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx));
+</head>
+<body class="antialiased">
 
-                document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {{
-                    const table = th.closest('table');
-                    const tbody = table.querySelector('tbody');
-                    Array.from(tbody.querySelectorAll('tr'))
-                        .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-                        .forEach(tr => tbody.appendChild(tr));
-                }})));
-            }});
-        </script>
-    </head>
-    <body>
-        <h1>Resultados da Busca no DOU</h1>
-        <p class="success">✅ **{len(df)} Resultados Encontrados** para: <b>{nome}</b></p>
-        <p class="info">Arquivo gerado em: {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}</p>
-        
-        {tabela_html}
-        
-    </body>
-    </html>
-    """
-    
-    # 4. Salvar o arquivo
-    with open(arquivo_saida, 'w', encoding='utf-8') as f:
-        f.write(html_output)
-        
-    print(f"\n✅ SUCESSO! Arquivo HTML estático salvo em: {os.path.abspath(arquivo_saida)}")
-    print("   Você pode abrir este arquivo diretamente no seu navegador.")
+    <header id="header" class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full top-0 z-50">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="text-xl font-bold text-[#6B8E23]">
+                ECOENG Solidário
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#sobre" class="nav-link">A Parceria</a>
+                <a href="#proposito" class="nav-link">Reciclagem com Propósito</a>
+                <a href="#impacto" class="nav-link">Nosso Impacto</a>
+                <a href="#participe" class="nav-link">Participe</a>
+            </div>
+        </nav>
+    </header>
 
-# ----------------------------------------------------------------------
-# EXECUÇÃO DA BUSCA
-# ----------------------------------------------------------------------
+    <main class="pt-16">
 
-if __name__ == "__main__":
-    # 🚨 DADOS DA BUSCA - AJUSTE AQUI ANTES DE EXECUTAR 🚨
-    nome_alvo = "JULIANA FERNANDES FARIAS" 
-    data_inicio_alvo = date(2023, 10, 1)
-    data_fim_alvo = date(2025, 10, 14)
+        <section id="hero" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold leading-tight text-[#4A4A4A]">Transforme Lixo em Esperança</h1>
+                <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto text-gray-600">
+                    O Desafio ECOENG Solidário une sustentabilidade e ação social. Junte-se a nós e à ONG Corrente do Bem para converter recicláveis em cestas básicas, cadeiras de rodas e um futuro melhor.
+                </p>
+                <a href="#participe" class="cta-button mt-8 inline-block bg-[#E58A80] text-white font-bold py-3 px-8 rounded-full shadow-lg">Participe Agora</a>
+            </div>
+        </section>
+
+        <section id="sobre" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-[#4A4A4A]">Uma Corrente Pelo Bem</h2>
+                    <p class="mt-2 text-gray-600">Conheça a iniciativa que está no coração do nosso desafio.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-2xl font-bold text-[#6B8E23] mb-4">Corrente do Bem #UnsPelosOutros</h3>
+                        <p class="mb-4">
+                            Fundada por Michele, esta iniciativa social e ambiental atua com um propósito claro: ajudar quem precisa e cuidar do planeta — tudo ao mesmo tempo. Acreditamos no poder dos pequenos gestos para gerar grandes transformações.
+                        </p>
+                        <p>
+                            A filosofia é simples: todos podem ajudar, sempre. Como diz Michele: "Eu também tenho milhões de problemas e não deixo de ajudar." A reciclagem é uma forma acessível e poderosa de fazer o bem.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-8 rounded-lg shadow-md">
+                        <h4 class="text-xl font-bold mb-4">O que a Corrente do Bem faz?</h4>
+                        <ul class="space-y-4">
+                            <li class="flex items-start"><span class="text-2xl mr-3">📚</span><span>Biblioteca comunitária infantojuvenil para incentivar a leitura.</span></li>
+                            <li class="flex items-start"><span class="text-2xl mr-3">🧸</span><span>Bazar permanente solidário com itens doados.</span></li>
+                            <li class="flex items-start"><span class="text-2xl mr-3">💊</span><span>Doações de remédios e fraldas para quem mais precisa.</span></li>
+                            <li class="flex items-start"><span class="text-2xl mr-3">🚨</span><span>Apoio emergencial a voluntários e famílias em vulnerabilidade.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="proposito" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-[#4A4A4A]">Reciclagem com Propósito</h2>
+                    <p class="mt-2 text-gray-600">Clique em um item e descubra como sua doação se transforma em ajuda direta.</p>
+                </div>
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex flex-col md:flex-row gap-4 mb-6">
+                        <button id="btn-lacres" class="recyclable-btn flex-1 p-4 rounded-lg font-semibold bg-gray-200 text-gray-700">🔘 Lacres de Alumínio</button>
+                        <button id="btn-plasticos" class="recyclable-btn flex-1 p-4 rounded-lg font-semibold bg-gray-200 text-gray-700">🔵 Plásticos Duros</button>
+                        <button id="btn-oleo" class="recyclable-btn flex-1 p-4 rounded-lg font-semibold bg-gray-200 text-gray-700">🟡 Óleo Usado</button>
+                    </div>
+                    <div id="purpose-display" class="bg-white p-8 rounded-lg shadow-xl min-h-[250px] flex items-center justify-center transition-all duration-500">
+                        
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="impacto" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-[#4A4A4A]">Por Quem Estamos Lutando?</h2>
+                    <p class="mt-2 text-gray-600">Sua contribuição gera um impacto triplo, construindo um futuro mais sustentável e justo.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8 text-center">
+                    <div class="bg-gray-50 p-8 rounded-lg">
+                        <div class="text-5xl mb-4">🌱</div>
+                        <h3 class="text-xl font-bold mb-2">Pelo Meio Ambiente</h3>
+                        <p>Desviamos resíduos de aterros, reduzimos a poluição e promovemos uma economia circular.</p>
+                    </div>
+                    <div class="bg-gray-50 p-8 rounded-lg">
+                        <div class="text-5xl mb-4">👶</div>
+                        <h3 class="text-xl font-bold mb-2">Pelas Futuras Gerações</h3>
+                        <p>Incentivamos a educação ambiental e criamos um legado de consciência e cuidado com o planeta.</p>
+                    </div>
+                    <div class="bg-gray-50 p-8 rounded-lg">
+                        <div class="text-5xl mb-4">🤝</div>
+                        <h3 class="text-xl font-bold mb-2">Pela Inclusão Social</h3>
+                        <p>Sua doação se transforma em alimentos, ração e cadeiras de rodas, garantindo dignidade.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="participe" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold text-[#4A4A4A]">Junte-se ao Desafio ECOENG Solidário!</h2>
+                <p class="mt-2 mb-8 text-gray-600 max-w-2xl mx-auto">Siga estes passos e faça parte da nossa corrente do bem. Arrecade, doe e inspire outros a participarem.</p>
+                <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg text-left">
+                    <h3 class="text-xl font-bold mb-4">O que arrecadar:</h3>
+                    <ul class="space-y-3 mb-6">
+                       <li class="flex items-center"><span class="text-green-500 mr-3">✅</span> Tampinhas plásticas</li>
+                       <li class="flex items-center"><span class="text-green-500 mr-3">✅</span> Lacres de alumínio</li>
+                       <li class="flex items-center"><span class="text-green-500 mr-3">✅</span> Garrafas PET</li>
+                       <li class="flex items-center"><span class="text-green-500 mr-3">✅</span> Óleo de cozinha usado (em garrafas bem fechadas)</li>
+                    </ul>
+
+                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md" role="alert">
+                        <p class="font-bold">📍 Ponto de Coleta:</p>
+                        <p>Rua Correia Dutra, 99 loja 14
+
+Catete - Rio de Janeiro - RJ
+
+Tel.: (21) 3547-3155
+
+Whatsapp: (21) 97289-5643
+
+​
+
+Segunda a Sexta
+
+9:00h às 17:00h</p>
+                    </div>
+                    
+                    <div class="mt-6 text-center">
+                        <p class="font-semibold">Divulgue sua colaboração!</p>
+                        <p>Marque: @mestraju + @correntesdobemunspelosoutros</p>
+                        <p>Use a hashtag: <span class="font-bold text-[#E58A80]">#DesafioEcoengSolidário</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
     
-    # Chama a função que executa a busca e gera o HTML
-    gerar_html_dos_resultados(nome_alvo, data_inicio_alvo, data_fim_alvo)
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Desafio ECOENG Solidário. Uma iniciativa pela sustentabilidade e solidariedade.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const purposeDisplay = document.getElementById('purpose-display');
+            const buttons = {
+                lacres: document.getElementById('btn-lacres'),
+                plasticos: document.getElementById('btn-plasticos'),
+                oleo: document.getElementById('btn-oleo')
+            };
+
+            const purposeContent = {
+                lacres: {
+                    icon: '♿',
+                    title: 'Aquisição de Cadeiras de Rodas',
+                    description: 'Cada lacre de alumínio doado é vendido e o valor arrecadado é revertido para a compra de cadeiras de rodas, oferecendo mobilidade e qualidade de vida a quem precisa.'
+                },
+                plasticos: {
+                    icon: '🍲',
+                    title: 'Ração e Cestas Básicas',
+                    description: 'Tampinhas e garrafas PET são transformadas em recursos para a compra de alimentos para famílias em vulnerabilidade e ração para animais resgatados, combatendo a fome e o abandono.'
+                },
+                oleo: {
+                    icon: '🌍',
+                    title: 'Manutenção da ONG e Proteção Ambiental',
+                    description: 'O óleo de cozinha usado, quando descartado corretamente, é vendido para empresas especializadas. O valor ajuda a manter as operações da ONG e evita a contaminação de rios e solos.'
+                }
+            };
+
+            function updateDisplay(type) {
+                const content = purposeContent[type];
+                if (!content) return;
+
+                purposeDisplay.innerHTML = `
+                    <div class="text-center p-4">
+                        <div class="text-6xl mb-4">${content.icon}</div>
+                        <h3 class="text-2xl font-bold text-[#4A4A4A] mb-2">${content.title}</h3>
+                        <p class="text-gray-600">${content.description}</p>
+                    </div>
+                `;
+
+                Object.values(buttons).forEach(btn => btn.classList.remove('active'));
+                buttons[type].classList.add('active');
+            }
+
+            buttons.lacres.addEventListener('click', () => updateDisplay('lacres'));
+            buttons.plasticos.addEventListener('click', () => updateDisplay('plasticos'));
+            buttons.oleo.addEventListener('click', () => updateDisplay('oleo'));
+
+            updateDisplay('plasticos');
+            
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
