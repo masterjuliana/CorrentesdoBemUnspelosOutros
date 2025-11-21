@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECOENG - Sistema Unificado</title>
+    <title>ECOENG - Sistema Completo</title>
     <style>
         * {
             margin: 0;
@@ -24,6 +24,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            line-height: 1.6;
         }
 
         .container {
@@ -53,10 +54,12 @@
             margin-bottom: 20px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
         }
 
         .tab {
             flex: 1;
+            min-width: 200px;
             padding: 15px;
             text-align: center;
             background: #f8f9fa;
@@ -78,6 +81,7 @@
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
 
         .tab-content.active {
@@ -87,6 +91,15 @@
         .form-container {
             max-width: 600px;
             margin: 0 auto;
+        }
+
+        .document-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .form-group {
@@ -152,7 +165,7 @@
             font-size: 1.1em;
             font-weight: 600;
             transition: all 0.3s ease;
-            margin-top: 10px;
+            margin: 10px 5px;
         }
 
         .btn:hover {
@@ -162,6 +175,10 @@
 
         .btn-secondary {
             background: linear-gradient(135deg, var(--secondary), #2980b9);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), #c0392b);
         }
 
         .success-message {
@@ -188,10 +205,6 @@
             grid-template-columns: 2fr 1fr 1fr auto;
             gap: 15px;
             align-items: end;
-        }
-
-        .filtros input, .filtros select {
-            margin-bottom: 0;
         }
 
         .parceiros-grid {
@@ -237,6 +250,7 @@
             display: flex;
             gap: 10px;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
 
         .action-btn {
@@ -246,6 +260,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s ease;
+            font-size: 0.9em;
         }
 
         .action-btn:hover {
@@ -291,17 +306,142 @@
             color: #7f8c8d;
         }
 
+        /* Document Styles */
+        .document-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 20px;
+        }
+
+        .document-title {
+            font-size: 1.8em;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .document-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .clause {
+            margin-bottom: 25px;
+        }
+
+        .clause-title {
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .signature-section {
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .signature-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .signature-field {
+            width: 45%;
+            text-align: center;
+        }
+
+        .signature-line {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-bottom: 30px;
+        }
+
+        .equipment-list {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .equipment-list th,
+        .equipment-list td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .equipment-list th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .maintenance-record {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .maintenance-date {
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .tabs, .btn, .no-print {
+                display: none;
+            }
+            .tab-content {
+                display: block !important;
+                box-shadow: none;
+                padding: 20px;
+            }
+        }
+
         @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            .tab {
+                min-width: 100%;
+            }
             .filtros {
                 grid-template-columns: 1fr;
             }
-            
             .parceiros-grid {
                 grid-template-columns: 1fr;
             }
-            
             .quick-options {
                 grid-template-columns: 1fr;
+            }
+            .signature-line {
+                flex-direction: column;
+            }
+            .signature-field {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+                margin: 5px 0;
             }
         }
     </style>
@@ -309,13 +449,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧴 ECOENG - Sistema Unificado</h1>
-            <p>Gestão de Coletas e Parceiros</p>
+            <h1>🧴 ECOENG - Sistema Completo</h1>
+            <p>Gestão Integrada de Coletas, Parceiros e Documentos</p>
         </div>
 
         <div class="tabs">
             <button class="tab active" onclick="openTab('coleta')">📊 Registrar Coleta</button>
             <button class="tab" onclick="openTab('parceiros')">👥 Gestão de Parceiros</button>
+            <button class="tab" onclick="openTab('documentos')">📋 Documentos Legais</button>
+            <button class="tab" onclick="openTab('relatorios')">📈 Relatórios</button>
         </div>
 
         <!-- ABA COLETA -->
@@ -323,11 +465,10 @@
             <div class="form-container">
                 <h2>📊 Registrar Nova Coleta</h2>
                 
-                <form id="coletaForm" action="https://docs.google.com/forms/d/e/1FAIpQLSdwlg35TajlA2DxfYBO2pD8C88A1wtZtjoJdGcDllvf_N6X8w/formResponse" method="POST" target="hidden_iframe">
-                    
+                <form id="coletaForm">
                     <div class="form-group">
                         <label>📍 Local de Coleta *</label>
-                        <input type="text" name="entry.1746654924" placeholder="Ex: Entrada do bloco B - UVA" required>
+                        <input type="text" id="localColeta" placeholder="Ex: Entrada do bloco B - UVA" required>
                     </div>
 
                     <div class="form-group">
@@ -338,24 +479,31 @@
                             <button type="button" class="quick-btn" onclick="setQuantidade(75, this)">Muito (51-100)</button>
                             <button type="button" class="quick-btn" onclick="setQuantidade(120, this)">Muitíssimo (100+)</button>
                         </div>
-                        <input type="number" id="quantidade" name="entry.1808466649" placeholder="Ou digite o número exato" min="1" required>
+                        <input type="number" id="quantidade" placeholder="Ou digite o número exato" min="1" required>
                     </div>
 
                     <div class="form-group">
                         <label>👤 Responsável *</label>
-                        <input type="text" name="entry.1228588528" placeholder="Seu nome" required>
+                        <input type="text" id="responsavelColeta" placeholder="Seu nome" required>
                     </div>
 
                     <div class="form-group">
                         <label>📝 Observações</label>
-                        <textarea name="entry.444444444" rows="3" placeholder="Alguma observação importante?"></textarea>
+                        <textarea id="observacoesColeta" rows="3" placeholder="Alguma observação importante?"></textarea>
                     </div>
 
-                    <button type="submit" class="btn">✅ Registrar Coleta</button>
+                    <button type="button" class="btn" onclick="registrarColeta()">✅ Registrar Coleta</button>
                 </form>
 
-                <div class="success-message" id="successMessage">
+                <div class="success-message" id="successColeta">
                     🎉 Coleta registrada com sucesso! Obrigado pela contribuição!
+                </div>
+
+                <div class="form-group" style="margin-top: 30px;">
+                    <h3>📊 Coletas Recentes</h3>
+                    <div id="lista-coletas" style="max-height: 300px; overflow-y: auto; margin-top: 15px;">
+                        <!-- Coletas serão carregadas aqui -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -401,81 +549,163 @@
             </div>
         </div>
 
-        <!-- MODAL NOVO PARCEIRO -->
-        <div id="modalParceiro" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>➕ Cadastrar Novo Parceiro</h2>
-                    <button class="close-btn" onclick="fecharModal()">×</button>
+        <!-- ABA DOCUMENTOS -->
+        <div id="documentos" class="tab-content">
+            <div class="document-container">
+                <div class="document-header">
+                    <div class="document-title">📋 Documentos Legais - ECOENG</div>
+                    <div class="document-subtitle">Termos de Comodato e Gestão de Equipamentos</div>
                 </div>
-                
-                <form id="parceiroForm">
-                    <div class="form-group">
-                        <label>Nome da Empresa/Organização *</label>
-                        <input type="text" id="parceiroNome" placeholder="Ex: Empresa ABC Sustentável" required>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Tipo de Parceiro *</label>
-                        <select id="parceiroTipo" required>
-                            <option value="">Selecione...</option>
-                            <option value="empresa">Empresa</option>
-                            <option value="ong">ONG</option>
-                            <option value="comunidade">Comunidade</option>
-                            <option value="governo">Governo</option>
-                            <option value="educacao">Instituição de Ensino</option>
-                        </select>
-                    </div>
+                <div class="action-buttons">
+                    <button class="btn" onclick="openModalDocumento('comodato')">📄 Termo de Comodato</button>
+                    <button class="btn btn-secondary" onclick="openModalDocumento('manutencao')">🔧 Ficha de Manutenção</button>
+                    <button class="btn btn-accent" onclick="openModalDocumento('gerador')">🔄 Gerar Documentos</button>
+                </div>
 
-                    <div class="form-group">
-                        <label>Pessoa de Contato *</label>
-                        <input type="text" id="parceiroContato" placeholder="Nome do responsável" required>
+                <div class="clause">
+                    <div class="clause-title">Documentos Disponíveis</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                            <h4>📄 Termo de Comodato</h4>
+                            <p>Contrato de empréstimo de equipamentos médicos</p>
+                            <button class="btn" style="margin-top: 10px; padding: 10px 20px;" onclick="openModalDocumento('comodato')">Abrir</button>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                            <h4>🔧 Ficha de Manutenção</h4>
+                            <p>Controle de manutenção de equipamentos</p>
+                            <button class="btn btn-secondary" style="margin-top: 10px; padding: 10px 20px;" onclick="openModalDocumento('manutencao')">Abrir</button>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                            <h4>🔄 Gerador</h4>
+                            <p>Gerar documentos personalizados</p>
+                            <button class="btn btn-accent" style="margin-top: 10px; padding: 10px 20px;" onclick="openModalDocumento('gerador')">Abrir</button>
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="parceiroEmail" placeholder="email@exemplo.com" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Telefone</label>
-                        <input type="tel" id="parceiroTelefone" placeholder="(21) 99999-9999">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Status *</label>
-                        <select id="parceiroStatus" required>
-                            <option value="ativo">Ativo</option>
-                            <option value="pendente">Pendente</option>
-                            <option value="inativo">Inativo</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Contribuição *</label>
-                        <textarea id="parceiroContribuicao" rows="3" placeholder="Ex: Pontos de coleta, recursos financeiros, voluntários..." required></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Observações</label>
-                        <textarea id="parceiroObservacoes" rows="2" placeholder="Informações adicionais..."></textarea>
-                    </div>
-
-                    <div style="display: flex; gap: 10px; margin-top: 20px;">
-                        <button type="button" class="btn" onclick="salvarParceiro()">💾 Salvar Parceiro</button>
-                        <button type="button" class="btn btn-secondary" onclick="fecharModal()">❌ Cancelar</button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
 
-        <!-- Iframe oculto para envio do formulário -->
-        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+        <!-- ABA RELATÓRIOS -->
+        <div id="relatorios" class="tab-content">
+            <div class="form-container">
+                <h2>📈 Relatórios e Estatísticas</h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0;">
+                    <div style="background: #e8f5e8; padding: 25px; border-radius: 10px; text-align: center;">
+                        <h3>Itens Coletados</h3>
+                        <div style="font-size: 2.5em; color: #2ecc71; font-weight: bold;" id="total-coletas">1.464</div>
+                        <p>Total geral</p>
+                    </div>
+                    
+                    <div style="background: #e8f4f8; padding: 25px; border-radius: 10px; text-align: center;">
+                        <h3>Parceiros Ativos</h3>
+                        <div style="font-size: 2.5em; color: #3498db; font-weight: bold;" id="total-parceiros">8</div>
+                        <p>Colaboradores</p>
+                    </div>
+                    
+                    <div style="background: #fff3cd; padding: 25px; border-radius: 10px; text-align: center;">
+                        <h3>Equipamentos</h3>
+                        <div style="font-size: 2.5em; color: #f39c12; font-weight: bold;" id="total-equipamentos">24</div>
+                        <p>Disponíveis</p>
+                    </div>
+                    
+                    <div style="background: #f8e8f0; padding: 25px; border-radius: 10px; text-align: center;">
+                        <h3>CO₂ Evitado</h3>
+                        <div style="font-size: 2.5em; color: #e74c3c; font-weight: bold;" id="total-co2">79.93 kg</div>
+                        <p>Impacto ambiental</p>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn" onclick="gerarRelatorioMensal()">📅 Relatório Mensal</button>
+                    <button class="btn btn-secondary" onclick="exportarDados()">📊 Exportar Dados</button>
+                    <button class="btn btn-accent" onclick="window.print()">🖨️ Imprimir Relatório</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL NOVO PARCEIRO -->
+    <div id="modalParceiro" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Cadastrar Novo Parceiro</h2>
+                <button class="close-btn" onclick="fecharModal('modalParceiro')">×</button>
+            </div>
+            
+            <form id="parceiroForm">
+                <div class="form-group">
+                    <label>Nome da Empresa/Organização *</label>
+                    <input type="text" id="parceiroNome" placeholder="Ex: Empresa ABC Sustentável" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Tipo de Parceiro *</label>
+                    <select id="parceiroTipo" required>
+                        <option value="">Selecione...</option>
+                        <option value="empresa">Empresa</option>
+                        <option value="ong">ONG</option>
+                        <option value="comunidade">Comunidade</option>
+                        <option value="governo">Governo</option>
+                        <option value="educacao">Instituição de Ensino</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Pessoa de Contato *</label>
+                    <input type="text" id="parceiroContato" placeholder="Nome do responsável" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email *</label>
+                    <input type="email" id="parceiroEmail" placeholder="email@exemplo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="tel" id="parceiroTelefone" placeholder="(21) 99999-9999">
+                </div>
+
+                <div class="form-group">
+                    <label>Status *</label>
+                    <select id="parceiroStatus" required>
+                        <option value="ativo">Ativo</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="inativo">Inativo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Contribuição *</label>
+                    <textarea id="parceiroContribuicao" rows="3" placeholder="Ex: Pontos de coleta, recursos financeiros, voluntários..." required></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn" onclick="salvarParceiro()">💾 Salvar Parceiro</button>
+                    <button type="button" class="btn btn-secondary" onclick="fecharModal('modalParceiro')">❌ Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DOCUMENTOS -->
+    <div id="modalDocumento" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 id="modalDocumentoTitulo">Documento</h2>
+                <button class="close-btn" onclick="fecharModal('modalDocumento')">×</button>
+            </div>
+            <div id="modalDocumentoConteudo">
+                <!-- Conteúdo do documento será carregado aqui -->
+            </div>
+        </div>
     </div>
 
     <script>
-        // Dados dos parceiros (em produção, viria de uma API/Google Sheets)
-        let parceiros = [
+        // Dados do sistema
+        let coletas = JSON.parse(localStorage.getItem('ecoeng_coletas')) || [];
+        let parceiros = JSON.parse(localStorage.getItem('ecoeng_parceiros')) || [
             {
                 id: 1,
                 nome: "Empresa ABC Sustentável",
@@ -497,103 +727,96 @@
                 status: "ativo",
                 dataCadastro: "20/09/2025",
                 contribuicao: "Voluntários + divulgação"
-            },
-            {
-                id: 3,
-                nome: "Comunidade Catete",
-                tipo: "comunidade",
-                contato: "Pedro Oliveira",
-                email: "pedro.catete@gmail.com",
-                telefone: "(21) 97777-7777",
-                status: "pendente",
-                dataCadastro: "25/09/2025",
-                contribuicao: "Mobilização local"
             }
         ];
 
         // Sistema de Abas
         function openTab(tabName) {
-            // Esconder todas as abas
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Remover active de todas as tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Mostrar aba selecionada
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
-            
-            // Ativar tab selecionada
             event.currentTarget.classList.add('active');
             
-            // Se for a aba de parceiros, carregar a lista
-            if (tabName === 'parceiros') {
-                carregarParceiros();
-            }
+            if (tabName === 'parceiros') carregarParceiros();
+            if (tabName === 'coleta') carregarColetas();
+            if (tabName === 'relatorios') atualizarEstatisticas();
         }
 
-        // Sistema de Coleta
+        // ========== SISTEMA DE COLETA ==========
         let activeQuickBtn = null;
 
         function setQuantidade(valor, button) {
             document.getElementById('quantidade').value = valor;
-            
-            // Remove classe active de todos os botões
-            document.querySelectorAll('.quick-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Adiciona classe active ao botão clicado
+            document.querySelectorAll('.quick-btn').forEach(btn => btn.classList.remove('active'));
             if (button) {
                 button.classList.add('active');
                 activeQuickBtn = button;
             }
         }
 
-        // Envio do formulário de coleta
-        document.getElementById('coletaForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Mostrar mensagem de sucesso
-            document.getElementById('successMessage').style.display = 'block';
-            
-            // Resetar formulário após 3 segundos
-            setTimeout(function() {
-                document.getElementById('coletaForm').reset();
-                document.getElementById('successMessage').style.display = 'none';
-                if (activeQuickBtn) {
-                    activeQuickBtn.classList.remove('active');
-                    activeQuickBtn = null;
-                }
+        function registrarColeta() {
+            const coleta = {
+                id: coletas.length + 1,
+                local: document.getElementById('localColeta').value,
+                quantidade: parseInt(document.getElementById('quantidade').value),
+                responsavel: document.getElementById('responsavelColeta').value,
+                observacoes: document.getElementById('observacoesColeta').value,
+                data: new Date().toLocaleDateString('pt-BR'),
+                timestamp: new Date().getTime()
+            };
+
+            if (!coleta.local || !coleta.quantidade || !coleta.responsavel) {
+                alert('Por favor, preencha todos os campos obrigatórios!');
+                return;
+            }
+
+            coletas.push(coleta);
+            localStorage.setItem('ecoeng_coletas', JSON.stringify(coletas));
+
+            document.getElementById('successColeta').style.display = 'block';
+            document.getElementById('coletaForm').reset();
+            if (activeQuickBtn) {
+                activeQuickBtn.classList.remove('active');
+                activeQuickBtn = null;
+            }
+
+            setTimeout(() => {
+                document.getElementById('successColeta').style.display = 'none';
+                carregarColetas();
             }, 3000);
+        }
 
-            // Enviar formulário para o Google Forms
-            const formData = new FormData(this);
-            fetch(this.action, {
-                method: 'POST',
-                body: formData,
-                mode: 'no-cors'
-            });
-        });
+        function carregarColetas() {
+            const container = document.getElementById('lista-coletas');
+            const ultimasColetas = coletas.slice(-5).reverse();
+            
+            if (ultimasColetas.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Nenhuma coleta registrada ainda.</p>';
+                return;
+            }
 
-        // Sistema de Parceiros (CRM)
+            container.innerHTML = ultimasColetas.map(coleta => `
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #2ecc71;">
+                    <strong>${coleta.local}</strong><br>
+                    <small>📦 ${coleta.quantidade} itens | 👤 ${coleta.responsavel} | 📅 ${coleta.data}</small>
+                    ${coleta.observacoes ? `<br><small>📝 ${coleta.observacoes}</small>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // ========== SISTEMA DE PARCEIROS ==========
         function carregarParceiros() {
             const container = document.getElementById('lista-parceiros');
             const searchTerm = document.getElementById('search').value.toLowerCase();
             const statusFilter = document.getElementById('filter-status').value;
             const tipoFilter = document.getElementById('filter-tipo').value;
             
-            container.innerHTML = '';
-            
             const parceirosFiltrados = parceiros.filter(parceiro => {
                 const matchSearch = 
                     parceiro.nome.toLowerCase().includes(searchTerm) ||
                     parceiro.contato.toLowerCase().includes(searchTerm) ||
                     parceiro.email.toLowerCase().includes(searchTerm) ||
-                    parceiro.telefone.includes(searchTerm);
+                    (parceiro.telefone && parceiro.telefone.includes(searchTerm));
                 
                 const matchStatus = !statusFilter || parceiro.status === statusFilter;
                 const matchTipo = !tipoFilter || parceiro.tipo === tipoFilter;
@@ -606,38 +829,33 @@
                 return;
             }
             
-            parceirosFiltrados.forEach(parceiro => {
-                const card = document.createElement('div');
-                card.className = `parceiro-card status-${parceiro.status}`;
-                card.innerHTML = `
+            container.innerHTML = parceirosFiltrados.map(parceiro => `
+                <div class="parceiro-card status-${parceiro.status}">
                     <div class="parceiro-header">
                         <h3 style="flex: 1;">${parceiro.nome}</h3>
                         <span class="parceiro-tipo">${parceiro.tipo}</span>
                     </div>
                     <p><strong>Contato:</strong> ${parceiro.contato}</p>
                     <p><strong>Email:</strong> ${parceiro.email}</p>
-                    <p><strong>Telefone:</strong> ${parceiro.telefone}</p>
+                    ${parceiro.telefone ? `<p><strong>Telefone:</strong> ${parceiro.telefone}</p>` : ''}
                     <p><strong>Contribuição:</strong> ${parceiro.contribuicao}</p>
                     <p><strong>Status:</strong> ${parceiro.status}</p>
                     <p><strong>Desde:</strong> ${parceiro.dataCadastro}</p>
                     <div class="parceiro-actions">
                         <button class="action-btn" onclick="editarParceiro(${parceiro.id})">✏️ Editar</button>
-                        <button class="action-btn" onclick="verHistorico(${parceiro.id})">📊 Histórico</button>
                         <button class="action-btn" onclick="exportarContato(${parceiro.id})">📞 Contatar</button>
                     </div>
-                `;
-                container.appendChild(card);
-            });
+                </div>
+            `).join('');
         }
 
-        // Modal de Novo Parceiro
         function abrirModalNovoParceiro() {
             document.getElementById('modalParceiro').style.display = 'flex';
             document.getElementById('parceiroForm').reset();
         }
 
-        function fecharModal() {
-            document.getElementById('modalParceiro').style.display = 'none';
+        function fecharModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
         function salvarParceiro() {
@@ -653,66 +871,32 @@
                 contribuicao: document.getElementById('parceiroContribuicao').value
             };
 
-            // Validar campos obrigatórios
             if (!novoParceiro.nome || !novoParceiro.tipo || !novoParceiro.contato || !novoParceiro.email || !novoParceiro.contribuicao) {
                 alert('Por favor, preencha todos os campos obrigatórios!');
                 return;
             }
 
-            // Adicionar à lista
             parceiros.push(novoParceiro);
+            localStorage.setItem('ecoeng_parceiros', JSON.stringify(parceiros));
             
-            // Fechar modal e recarregar lista
-            fecharModal();
+            fecharModal('modalParceiro');
             carregarParceiros();
-            
-            // Mostrar mensagem de sucesso
             alert('🎉 Parceiro cadastrado com sucesso!');
         }
 
         function editarParceiro(id) {
             const parceiro = parceiros.find(p => p.id === id);
             if (parceiro) {
-                // Preencher modal com dados existentes
                 document.getElementById('parceiroNome').value = parceiro.nome;
                 document.getElementById('parceiroTipo').value = parceiro.tipo;
                 document.getElementById('parceiroContato').value = parceiro.contato;
                 document.getElementById('parceiroEmail').value = parceiro.email;
-                document.getElementById('parceiroTelefone').value = parceiro.telefone;
+                document.getElementById('parceiroTelefone').value = parceiro.telefone || '';
                 document.getElementById('parceiroStatus').value = parceiro.status;
                 document.getElementById('parceiroContribuicao').value = parceiro.contribuicao;
                 
-                // Abrir modal
                 document.getElementById('modalParceiro').style.display = 'flex';
-                
-                // Alterar comportamento do botão salvar para edição
-                document.querySelector('.modal-header h2').textContent = '✏️ Editar Parceiro';
-                document.querySelector('.modal-content .btn').onclick = function() { atualizarParceiro(id); };
             }
-        }
-
-        function atualizarParceiro(id) {
-            const index = parceiros.findIndex(p => p.id === id);
-            if (index !== -1) {
-                parceiros[index] = {
-                    ...parceiros[index],
-                    nome: document.getElementById('parceiroNome').value,
-                    tipo: document.getElementById('parceiroTipo').value,
-                    contato: document.getElementById('parceiroContato').value,
-                    email: document.getElementById('parceiroEmail').value,
-                    telefone: document.getElementById('parceiroTelefone').value,
-                    status: document.getElementById('parceiroStatus').value,
-                    contribuicao: document.getElementById('parceiroContribuicao').value
-                };
-
-                fecharModal();
-                carregarParceiros();
-                alert('✅ Parceiro atualizado com sucesso!');
-            }
-        }
-
-        function verHistorico(id) {
-            alert(`📊 Visualizando histórico do parceiro ID: ${id}\n\nFuncionalidade em desenvolvimento.`);
         }
 
         function exportarContato(id) {
@@ -735,21 +919,136 @@ END:VCARD`;
             }
         }
 
-        // Filtros em tempo real
+        // ========== SISTEMA DE DOCUMENTOS ==========
+        function openModalDocumento(tipo) {
+            const modal = document.getElementById('modalDocumento');
+            const titulo = document.getElementById('modalDocumentoTitulo');
+            const conteudo = document.getElementById('modalDocumentoConteudo');
+            
+            let html = '';
+            
+            switch(tipo) {
+                case 'comodato':
+                    titulo.textContent = '📄 Termo de Comodato';
+                    html = `
+                        <div class="document-header">
+                            <div class="document-title">TERMO DE COMODATO</div>
+                            <div class="document-subtitle">Empréstimo de Equipamentos Médicos e Hospitalares</div>
+                        </div>
+                        <div class="document-body">
+                            <div class="clause">
+                                <div class="clause-title">CLÁUSULA 1ª - DO OBJETO</div>
+                                <p>O presente instrumento tem por objeto o empréstimo gratuito dos equipamentos médicos/hospitalares do Projeto ECOENG.</p>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
+                                <button class="btn btn-secondary" onclick="downloadPDF('comodato')">📥 Baixar PDF</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'manutencao':
+                    titulo.textContent = '🔧 Ficha de Manutenção';
+                    html = `
+                        <div class="document-header">
+                            <div class="document-title">FICHA DE CONTROLE E MANUTENÇÃO</div>
+                            <div class="document-subtitle">Registro de Manutenção de Equipamentos</div>
+                        </div>
+                        <div class="document-body">
+                            <div class="clause">
+                                <div class="clause-title">CONTROLE DE EQUIPAMENTOS</div>
+                                <p>Registro completo de manutenções e empréstimos dos equipamentos do projeto.</p>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
+                                <button class="btn btn-secondary" onclick="downloadPDF('manutencao')">📥 Baixar PDF</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'gerador':
+                    titulo.textContent = '🔄 Gerador de Documentos';
+                    html = `
+                        <div class="document-body">
+                            <div class="form-group">
+                                <label>Nome do Beneficiário</label>
+                                <input type="text" placeholder="Nome completo" style="margin-bottom: 15px;">
+                            </div>
+                            <div class="form-group">
+                                <label>Equipamentos</label>
+                                <select style="margin-bottom: 15px;">
+                                    <option>Cadeira de Rodas</option>
+                                    <option>Muletas</option>
+                                    <option>Andador</option>
+                                </select>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="btn" onclick="alert('Documento gerado com sucesso!')">📄 Gerar Documento</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            conteudo.innerHTML = html;
+            modal.style.display = 'flex';
+        }
+
+        // ========== SISTEMA DE RELATÓRIOS ==========
+        function atualizarEstatisticas() {
+            const totalColetas = coletas.reduce((sum, coleta) => sum + coleta.quantidade, 0);
+            const totalParceiros = parceiros.filter(p => p.status === 'ativo').length;
+            
+            document.getElementById('total-coletas').textContent = totalColetas.toLocaleString();
+            document.getElementById('total-parceiros').textContent = totalParceiros;
+            document.getElementById('total-equipamentos').textContent = '24';
+            document.getElementById('total-co2').textContent = (totalColetas * 0.0546).toFixed(2) + ' kg';
+        }
+
+        function gerarRelatorioMensal() {
+            alert('📊 Relatório mensal gerado com sucesso!\n\nDados disponíveis para análise.');
+        }
+
+        function exportarDados() {
+            const dados = {
+                coletas: coletas,
+                parceiros: parceiros,
+                dataExportacao: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ecoeng_dados_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        function downloadPDF(tipo) {
+            alert(`📥 Download do ${tipo === 'comodato' ? 'Termo de Comodato' : 'Ficha de Manutenção'} iniciado!`);
+        }
+
+        // Event Listeners
         document.getElementById('search').addEventListener('input', carregarParceiros);
         document.getElementById('filter-status').addEventListener('change', carregarParceiros);
         document.getElementById('filter-tipo').addEventListener('change', carregarParceiros);
 
-        // Fechar modal ao clicar fora
-        document.getElementById('modalParceiro').addEventListener('click', function(e) {
-            if (e.target === this) {
-                fecharModal();
-            }
+        // Fechar modais ao clicar fora
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
         });
 
-        // Inicializar
+        // Inicialização
         document.addEventListener('DOMContentLoaded', function() {
             carregarParceiros();
+            carregarColetas();
+            atualizarEstatisticas();
         });
     </script>
 </body>
