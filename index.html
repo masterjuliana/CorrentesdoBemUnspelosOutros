@@ -3,249 +3,859 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desafio ECOENG Solidário & Corrente do Bem</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Calm Harmony -->
-    <!-- Application Structure Plan: A single-page, vertical scrolling application with a fixed top navigation bar for easy access to different thematic sections. The structure is designed to tell a story: 1) Hero section to grab attention and introduce the challenge. 2) A section introducing the partner NGO and its mission. 3) A core interactive section where users can click on different recyclables to see their direct social impact, making the connection tangible. 4) An inspirational section covering the NGO's philosophy and broader impact. 5) A clear, actionable final section detailing how to participate. This narrative flow is more engaging and exploratory than a static card-based layout, guiding the user from awareness to action while allowing non-linear exploration via the nav bar. -->
-    <!-- Visualization & Content Choices: Report Info: Recycling outcomes (Card 3) -> Goal: Engage/Inform -> Viz/Presentation: Interactive tabbed component (HTML/CSS/JS) -> Interaction: User clicks on a recyclable type (e.g., 'Plásticos') and a display area dynamically updates with the corresponding outcome (e.g., 'Cestas Básicas'). Justification: This transforms a static list into an engaging discovery tool, directly connecting user action with social good. | Report Info: NGO services (Card 2) & Impact (Card 5) -> Goal: Inform/Organize -> Viz/Presentation: Styled lists and grid layouts with Unicode icons (HTML/Tailwind CSS). Justification: This visually organizes qualitative information for quick comprehension without needing complex charts. The focus is on interactive HTML elements over data-driven charts, as the source material is primarily qualitative and narrative-based. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>Movimento ReTec - Por uma Economia Circular Justa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --green-600: #059669;
+            --green-700: #047857;
+            --green-800: #065f46;
+            --yellow-300: #fde047;
+            --yellow-500: #eab308;
+            --yellow-600: #ca8a04;
+            --blue-600: #2563eb;
+            --blue-700: #1d4ed8;
+            --gray-50: #f9fafb;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #FDFBF8;
-            color: #4A4A4A;
+            background: linear-gradient(135deg, var(--green-600), var(--green-700), var(--green-800));
+            color: var(--white);
+            line-height: 1.6;
         }
-        .nav-link {
-            transition: color 0.3s ease;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
         }
-        .nav-link:hover {
-            color: #E58A80;
+
+        .py-20 {
+            padding-top: 5rem;
+            padding-bottom: 5rem;
         }
-        .cta-button {
-            transition: background-color 0.3s ease, transform 0.3s ease;
+
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
         }
-        .cta-button:hover {
-            transform: translateY(-2px);
-            background-color: #D4756A;
+
+        .text-center {
+            text-align: center;
         }
-        .recyclable-btn {
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mb-8 {
+            margin-bottom: 2rem;
+        }
+
+        .mb-12 {
+            margin-bottom: 3rem;
+        }
+
+        .mb-16 {
+            margin-bottom: 4rem;
+        }
+
+        .mt-1 {
+            margin-top: 0.25rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mt-6 {
+            margin-top: 1.5rem;
+        }
+
+        .mt-8 {
+            margin-top: 2rem;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .items-start {
+            align-items: flex-start;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-3 {
+            gap: 0.75rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        .gap-8 {
+            gap: 2rem;
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .lg-grid-cols-2 {
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 1024px) {
+            .lg-grid-cols-2 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .max-w-3xl {
+            max-width: 48rem;
+        }
+
+        .max-w-6xl {
+            max-width: 72rem;
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .bg-white {
+            background-color: var(--white);
+        }
+
+        .bg-green-50 {
+            background-color: #ecfdf5;
+        }
+
+        .bg-blue-50 {
+            background-color: #eff6ff;
+        }
+
+        .bg-yellow-500 {
+            background-color: var(--yellow-500);
+        }
+
+        .bg-green-600 {
+            background-color: var(--green-600);
+        }
+
+        .bg-blue-600 {
+            background-color: var(--blue-600);
+        }
+
+        .bg-white-20 {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .text-gray-900 {
+            color: var(--gray-900);
+        }
+
+        .text-gray-700 {
+            color: var(--gray-700);
+        }
+
+        .text-gray-600 {
+            color: var(--gray-600);
+        }
+
+        .text-white {
+            color: var(--white);
+        }
+
+        .text-yellow-300 {
+            color: var(--yellow-300);
+        }
+
+        .text-green-600 {
+            color: var(--green-600);
+        }
+
+        .text-blue-600 {
+            color: var(--blue-600);
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+        }
+
+        .text-xl {
+            font-size: 1.25rem;
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+        }
+
+        .text-4xl {
+            font-size: 2.25rem;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .leading-relaxed {
+            line-height: 1.625;
+        }
+
+        .whitespace-pre-wrap {
+            white-space: pre-wrap;
+        }
+
+        .border-0 {
+            border: none;
+        }
+
+        .border-2 {
+            border-width: 2px;
+        }
+
+        .border-gray-200 {
+            border-color: var(--gray-200);
+        }
+
+        .border-green-200 {
+            border-color: #a7f3d0;
+        }
+
+        .border-blue-200 {
+            border-color: #bfdbfe;
+        }
+
+        .border-white-30 {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem;
+        }
+
+        .rounded-2xl {
+            border-radius: 1rem;
+        }
+
+        .rounded-full {
+            border-radius: 9999px;
+        }
+
+        .p-2 {
+            padding: 0.5rem;
+        }
+
+        .p-3 {
+            padding: 0.75rem;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .p-8 {
+            padding: 2rem;
+        }
+
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .px-8 {
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .py-3 {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .h-5 {
+            height: 1.25rem;
+        }
+
+        .h-7 {
+            height: 1.75rem;
+        }
+
+        .h-12 {
+            height: 3rem;
+        }
+
+        .h-auto {
+            height: auto;
+        }
+
+        .w-5 {
+            width: 1.25rem;
+        }
+
+        .w-7 {
+            width: 1.75rem;
+        }
+
+        .w-full {
+            width: 100%;
+        }
+
+        .flex-shrink-0 {
+            flex-shrink: 0;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .backdrop-blur-sm {
+            backdrop-filter: blur(4px);
+        }
+
+        .shadow-2xl {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .shadow-3xl {
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+        }
+
+        .transition-all {
             transition: all 0.3s ease;
         }
-        .recyclable-btn.active {
-            background-color: #6B8E23;
-            color: #FFFFFF;
+
+        .transition-colors {
+            transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .duration-300 {
+            transition-duration: 300ms;
+        }
+
+        .transform {
+            transform: scale(1);
+        }
+
+        .hover-scale-105:hover {
             transform: scale(1.05);
+        }
+
+        .hover-bg-yellow-400:hover {
+            background-color: #facc15;
+        }
+
+        .hover-bg-green-700:hover {
+            background-color: var(--green-700);
+        }
+
+        .hover-bg-blue-700:hover {
+            background-color: var(--blue-700);
+        }
+
+        .hover-bg-yellow-600:hover {
+            background-color: var(--yellow-600);
+        }
+
+        .hover-bg-white-30:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .badge-outline {
+            background-color: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
+        .input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--green-600);
+        }
+
+        .textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            min-height: 100px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .textarea:focus {
+            outline: none;
+            border-color: var(--green-600);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-lg {
+            padding: 0.875rem 2rem;
+            font-size: 1.125rem;
+        }
+
+        .btn-primary {
+            background-color: var(--green-600);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--green-700);
+        }
+
+        .btn-secondary {
+            background-color: var(--blue-600);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--blue-700);
+        }
+
+        .btn-accent {
+            background-color: var(--yellow-500);
+            color: var(--gray-900);
+        }
+
+        .btn-accent:hover {
+            background-color: var(--yellow-600);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--gray-50);
+        }
+
+        .toast {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
+            background-color: var(--white);
+            color: var(--gray-900);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-success {
+            border-left: 4px solid var(--green-600);
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-description {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        @media (max-width: 768px) {
+            .text-4xl {
+                font-size: 1.875rem;
+            }
+            
+            .text-2xl {
+                font-size: 1.375rem;
+            }
+            
+            .p-8 {
+                padding: 1.5rem;
+            }
+            
+            .flex-wrap {
+                gap: 0.5rem;
+            }
+            
+            .badge {
+                font-size: 0.75rem;
+                padding: 0.375rem 0.75rem;
+            }
         }
     </style>
 </head>
-<body class="antialiased">
-
-    <header id="header" class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full top-0 z-50">
-        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="text-xl font-bold text-[#6B8E23]">
-                ECOENG Solidário
-            </div>
-            <div class="hidden md:flex space-x-8">
-                <a href="#sobre" class="nav-link">A Parceria</a>
-                <a href="#proposito" class="nav-link">Reciclagem com Propósito</a>
-                <a href="#impacto" class="nav-link">Nosso Impacto</a>
-                <a href="#participe" class="nav-link">Participe</a>
-            </div>
-        </nav>
-    </header>
-
-    <main class="pt-16">
-
-        <section id="hero" class="py-20 md:py-32">
-            <div class="container mx-auto px-6 text-center">
-                <h1 class="text-4xl md:text-6xl font-bold leading-tight text-[#4A4A4A]">Transforme Lixo em Esperança</h1>
-                <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto text-gray-600">
-                    O Desafio ECOENG Solidário une sustentabilidade e ação social. Junte-se a nós e à ONG Corrente do Bem para converter recicláveis em cestas básicas, cadeiras de rodas e um futuro melhor.
+<body>
+    <section class="py-20 px-4">
+        <div class="container max-w-6xl">
+            <div class="text-center mb-16">
+                <div class="badge bg-yellow-500 text-gray-900 hover-bg-yellow-400 mb-4">
+                    #MovimentoReTec
+                </div>
+                <h2 class="text-4xl font-bold mb-6 text-white">
+                    Faça Parte Dessa <span class="text-yellow-300">Mudança</span>
+                </h2>
+                <p class="text-xl text-white max-w-3xl mx-auto leading-relaxed">
+                    Não queremos que você só descarte seu lixo. Queremos que você se junte a nós para 
+                    <span class="font-semibold text-yellow-300"> mudar as regras do jogo</span>.
                 </p>
-                <a href="#participe" class="cta-button mt-8 inline-block bg-[#E58A80] text-white font-bold py-3 px-8 rounded-full shadow-lg">Participe Agora</a>
             </div>
-        </section>
 
-        <section id="sobre" class="py-16 bg-white">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-[#4A4A4A]">Uma Corrente Pelo Bem</h2>
-                    <p class="mt-2 text-gray-600">Conheça a iniciativa que está no coração do nosso desafio.</p>
-                </div>
-                <div class="grid md:grid-cols-2 gap-12 items-center">
-                    <div>
-                        <h3 class="text-2xl font-bold text-[#6B8E23] mb-4">Corrente do Bem #UnsPelosOutros</h3>
-                        <p class="mb-4">
-                            Fundada por Michele, esta iniciativa social e ambiental atua com um propósito claro: ajudar quem precisa e cuidar do planeta — tudo ao mesmo tempo. Acreditamos no poder dos pequenos gestos para gerar grandes transformações.
-                        </p>
-                        <p>
-                            A filosofia é simples: todos podem ajudar, sempre. Como diz Michele: "Eu também tenho milhões de problemas e não deixo de ajudar." A reciclagem é uma forma acessível e poderosa de fazer o bem.
-                        </p>
-                    </div>
-                    <div class="bg-gray-50 p-8 rounded-lg shadow-md">
-                        <h4 class="text-xl font-bold mb-4">O que a Corrente do Bem faz?</h4>
-                        <ul class="space-y-4">
-                            <li class="flex items-start"><span class="text-2xl mr-3">📚</span><span>Biblioteca comunitária infantojuvenil para incentivar a leitura.</span></li>
-                            <li class="flex items-start"><span class="text-2xl mr-3">🧸</span><span>Bazar permanente solidário com itens doados.</span></li>
-                            <li class="flex items-start"><span class="text-2xl mr-3">💊</span><span>Doações de remédios e fraldas para quem mais precisa.</span></li>
-                            <li class="flex items-start"><span class="text-2xl mr-3">🚨</span><span>Apoio emergencial a voluntários e famílias em vulnerabilidade.</span></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="proposito" class="py-20">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-[#4A4A4A]">Reciclagem com Propósito</h2>
-                    <p class="mt-2 text-gray-600">Clique em um item e descubra como sua doação se transforma em ajuda direta.</p>
-                </div>
-                <div class="max-w-4xl mx-auto">
-                    <div class="flex flex-col md:flex-row gap-4 mb-6">
-                        <button id="btn-lacres" class="recyclable-btn flex-1 p-4 rounded-lg font-semibold bg-gray-200 text-gray-700">🔘 Lacres de Alumínio</button>
-                        <button id="btn-plasticos" class="recyclable-btn flex-1 p-4 rounded-lg font-semibold bg-gray-200 text-gray-700">🔵 Plásticos Duros</button>
-                        <button id="btn-oleo" class="recyclable-btn flex-1 p-4 rounded-lg font-semibold bg-gray-200 text-gray-700">🟡 Óleo Usado</button>
-                    </div>
-                    <div id="purpose-display" class="bg-white p-8 rounded-lg shadow-xl min-h-[250px] flex items-center justify-center transition-all duration-500">
+            <div class="grid grid-cols-1 lg-grid-cols-2 gap-8 mb-16">
+                <!-- Card de Assinatura da Petição -->
+                <div class="card">
+                    <div class="card-content">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="bg-green-50 p-3 rounded-2xl">
+                                <i class="fas fa-file-signature text-green-600 h-7 w-7"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900">Assine a Petição</h3>
+                                <p class="text-gray-600 mt-1">Junte-se a milhares de apoiadores</p>
+                            </div>
+                        </div>
                         
+                        <form id="petition-form" class="space-y-4">
+                            <div>
+                                <input 
+                                    type="email" 
+                                    id="email-input"
+                                    placeholder="seu.melhor@email.com" 
+                                    class="input"
+                                    required
+                                >
+                            </div>
+                            <button type="submit" class="btn btn-primary w-full h-12 text-lg font-semibold transition-all duration-300 transform hover-scale-105">
+                                <i class="fas fa-check-circle mr-3 h-5 w-5"></i>
+                                Assinar Petição
+                            </button>
+                        </form>
+
+                        <div class="mt-6 p-4 bg-green-50 rounded-xl border border-green-200">
+                            <p class="text-sm text-gray-700 flex items-start gap-2">
+                                <i class="fas fa-check-circle text-green-600 mt-0.5 flex-shrink-0"></i>
+                                Ao assinar, você receberá atualizações sobre audiências públicas, campanhas e ações do movimento. Seus dados estão protegidos.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card de Cobrança aos Vereadores -->
+                <div class="card">
+                    <div class="card-content">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="bg-blue-50 p-3 rounded-2xl">
+                                <i class="fas fa-envelope text-blue-600 h-7 w-7"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900">Cobre Ação Política</h3>
+                                <p class="text-gray-600 mt-1">Exija uma audiência pública</p>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="p-4 bg-gray-50 rounded-xl border-2 border-gray-200">
+                                <p id="email-template" class="text-sm text-gray-700 whitespace-pre-wrap">
+Prezado(a) Vereador(a),
+
+Venho por meio desta mensagem solicitar urgência na discussão e implementação de uma Política Municipal de Logística Reversa para resíduos eletroeletrônicos em nossa cidade.
+
+Como cidadão(ã) preocupado(a) com o meio ambiente e a saúde pública, observo que:
+
+• Falta coleta domiciliar para eletroeletrônicos
+• Os ecopontos são insuficientes e distantes
+• Trabalhadores da reciclagem atuam sem proteção adequada
+• Empresas não cumprem sua responsabilidade pós-venda
+
+Solicito que seja agendada uma Audiência Pública para debater este tema urgente, com participação da sociedade civil, catadores e setor empresarial.
+
+Atenciosamente,
+[Seu Nome]
+Movimento ReTec - Por uma economia circular justa
+                                </p>
+                            </div>
+                            
+                            <div class="flex gap-3">
+                                <button id="copy-btn" class="btn btn-secondary flex-1 h-12 text-lg font-semibold transition-all duration-300">
+                                    <i id="copy-icon" class="fas fa-copy mr-2 h-5 w-5"></i>
+                                    <span id="copy-text">Copiar Modelo</span>
+                                </button>
+                                
+                                <button id="councilors-btn" class="btn btn-outline flex-1 h-12 text-lg font-semibold border-2">
+                                    <i class="fas fa-comment-alt mr-2 h-5 w-5"></i>
+                                    Ver Vereadores
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                            <p class="text-sm text-gray-700">
+                                <strong>Dica:</strong> Envie este e-mail para a Câmara Municipal e marque os vereadores da sua região nas redes sociais.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
-        
-        <section id="impacto" class="py-16 bg-white">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-[#4A4A4A]">Por Quem Estamos Lutando?</h2>
-                    <p class="mt-2 text-gray-600">Sua contribuição gera um impacto triplo, construindo um futuro mais sustentável e justo.</p>
+
+            <!-- Seção de Compartilhamento -->
+            <div class="text-center">
+                <div class="mb-8">
+                    <p class="text-xl text-white mb-6">
+                        <span class="font-semibold text-yellow-300">Compartilhe</span> o movimento e amplifique nossa voz
+                    </p>
+                    <button id="share-btn" class="btn btn-accent btn-lg font-semibold px-8 py-3 h-auto transition-all duration-300 transform hover-scale-105">
+                        <i class="fas fa-share-alt mr-3 h-5 w-5"></i>
+                        Compartilhar o Movimento
+                    </button>
                 </div>
-                <div class="grid md:grid-cols-3 gap-8 text-center">
-                    <div class="bg-gray-50 p-8 rounded-lg">
-                        <div class="text-5xl mb-4">🌱</div>
-                        <h3 class="text-xl font-bold mb-2">Pelo Meio Ambiente</h3>
-                        <p>Desviamos resíduos de aterros, reduzimos a poluição e promovemos uma economia circular.</p>
-                    </div>
-                    <div class="bg-gray-50 p-8 rounded-lg">
-                        <div class="text-5xl mb-4">👶</div>
-                        <h3 class="text-xl font-bold mb-2">Pelas Futuras Gerações</h3>
-                        <p>Incentivamos a educação ambiental e criamos um legado de consciência e cuidado com o planeta.</p>
-                    </div>
-                    <div class="bg-gray-50 p-8 rounded-lg">
-                        <div class="text-5xl mb-4">🤝</div>
-                        <h3 class="text-xl font-bold mb-2">Pela Inclusão Social</h3>
-                        <p>Sua doação se transforma em alimentos, ração e cadeiras de rodas, garantindo dignidade.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="participe" class="py-20">
-            <div class="container mx-auto px-6 text-center">
-                <h2 class="text-3xl font-bold text-[#4A4A4A]">Junte-se ao Desafio ECOENG Solidário!</h2>
-                <p class="mt-2 mb-8 text-gray-600 max-w-2xl mx-auto">Siga estes passos e faça parte da nossa corrente do bem. Arrecade, doe e inspire outros a participarem.</p>
-                <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg text-left">
-                    <h3 class="text-xl font-bold mb-4">O que arrecadar:</h3>
-                    <ul class="space-y-3 mb-6">
-                       <li class="flex items-center"><span class="text-green-500 mr-3">✅</span> Tampinhas plásticas</li>
-                       <li class="flex items-center"><span class="text-green-500 mr-3">✅</span> Lacres de alumínio</li>
-                       <li class="flex items-center"><span class="text-green-500 mr-3">✅</span> Garrafas PET</li>
-                       <li class="flex items-center"><span class="text-green-500 mr-3">✅</span> Óleo de cozinha usado (em garrafas bem fechadas)</li>
-                    </ul>
-
-                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md" role="alert">
-                        <p class="font-bold">📍 Ponto de Coleta:</p>
-                        <p>Rua Correia Dutra, 99 loja 14
-
-Catete - Rio de Janeiro - RJ
-
-Tel.: (21) 3547-3155
-
-Whatsapp: (21) 97289-5643
-
-​
-
-Segunda a Sexta
-
-9:00h às 17:00h</p>
-                    </div>
-                    
-                    <div class="mt-6 text-center">
-                        <p class="font-semibold">Divulgue sua colaboração!</p>
-                        <p>Marque: @mestraju + @correntesdobemunspelosoutros</p>
-                        <p>Use a hashtag: <span class="font-bold text-[#E58A80]">#DesafioEcoengSolidário</span></p>
-                    </div>
+                
+                <!-- Hashtags -->
+                <div class="mt-8 flex flex-wrap justify-center gap-3">
+                    <div class="badge badge-outline cursor-pointer" data-hashtag="#ReTec">#ReTec</div>
+                    <div class="badge badge-outline cursor-pointer" data-hashtag="#EconomiaCircularJusta">#EconomiaCircularJusta</div>
+                    <div class="badge badge-outline cursor-pointer" data-hashtag="#MovimentoReTec">#MovimentoReTec</div>
+                    <div class="badge badge-outline cursor-pointer" data-hashtag="#ColetaDomiciliarJá">#ColetaDomiciliarJá</div>
+                    <div class="badge badge-outline cursor-pointer" data-hashtag="#ValorizeOCatador">#ValorizeOCatador</div>
+                    <div class="badge badge-outline cursor-pointer" data-hashtag="#PolíticaPúblicaJá">#PolíticaPúblicaJá</div>
+                    <div class="badge badge-outline cursor-pointer" data-hashtag="#DireitoAoReparo">#DireitoAoReparo</div>
+                    <div class="badge badge-outline cursor-pointer" data-hashtag="#LogísticaReversa">#LogísticaReversa</div>
                 </div>
             </div>
-        </section>
-
-    </main>
-    
-    <footer class="bg-gray-800 text-white py-6">
-        <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2025 Desafio ECOENG Solidário. Uma iniciativa pela sustentabilidade e solidariedade.</p>
         </div>
-    </footer>
+    </section>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <i id="toast-icon" class="toast-icon"></i>
+        <div class="toast-content">
+            <div id="toast-title" class="toast-title"></div>
+            <div id="toast-description" class="toast-description"></div>
+        </div>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const purposeDisplay = document.getElementById('purpose-display');
-            const buttons = {
-                lacres: document.getElementById('btn-lacres'),
-                plasticos: document.getElementById('btn-plasticos'),
-                oleo: document.getElementById('btn-oleo')
-            };
+        // Elementos DOM
+        const petitionForm = document.getElementById('petition-form');
+        const emailInput = document.getElementById('email-input');
+        const copyBtn = document.getElementById('copy-btn');
+        const copyIcon = document.getElementById('copy-icon');
+        const copyText = document.getElementById('copy-text');
+        const councilorsBtn = document.getElementById('councilors-btn');
+        const shareBtn = document.getElementById('share-btn');
+        const toast = document.getElementById('toast');
+        const toastIcon = document.getElementById('toast-icon');
+        const toastTitle = document.getElementById('toast-title');
+        const toastDescription = document.getElementById('toast-description');
+        const hashtags = document.querySelectorAll('[data-hashtag]');
+        const emailTemplate = document.getElementById('email-template').textContent;
 
-            const purposeContent = {
-                lacres: {
-                    icon: '♿',
-                    title: 'Aquisição de Cadeiras de Rodas',
-                    description: 'Cada lacre de alumínio doado é vendido e o valor arrecadado é revertido para a compra de cadeiras de rodas, oferecendo mobilidade e qualidade de vida a quem precisa.'
-                },
-                plasticos: {
-                    icon: '🍲',
-                    title: 'Ração e Cestas Básicas',
-                    description: 'Tampinhas e garrafas PET são transformadas em recursos para a compra de alimentos para famílias em vulnerabilidade e ração para animais resgatados, combatendo a fome e o abandono.'
-                },
-                oleo: {
-                    icon: '🌍',
-                    title: 'Manutenção da ONG e Proteção Ambiental',
-                    description: 'O óleo de cozinha usado, quando descartado corretamente, é vendido para empresas especializadas. O valor ajuda a manter as operações da ONG e evita a contaminação de rios e solos.'
-                }
-            };
-
-            function updateDisplay(type) {
-                const content = purposeContent[type];
-                if (!content) return;
-
-                purposeDisplay.innerHTML = `
-                    <div class="text-center p-4">
-                        <div class="text-6xl mb-4">${content.icon}</div>
-                        <h3 class="text-2xl font-bold text-[#4A4A4A] mb-2">${content.title}</h3>
-                        <p class="text-gray-600">${content.description}</p>
-                    </div>
-                `;
-
-                Object.values(buttons).forEach(btn => btn.classList.remove('active'));
-                buttons[type].classList.add('active');
-            }
-
-            buttons.lacres.addEventListener('click', () => updateDisplay('lacres'));
-            buttons.plasticos.addEventListener('click', () => updateDisplay('plasticos'));
-            buttons.oleo.addEventListener('click', () => updateDisplay('oleo'));
-
-            updateDisplay('plasticos');
+        // Função para mostrar notificação
+        function showToast(title, description, iconClass, type = 'success') {
+            toastIcon.className = `toast-icon ${iconClass}`;
+            toastTitle.textContent = title;
+            toastDescription.textContent = description;
+            toast.className = `toast toast-${type} show`;
             
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // Assinar petição
+        petitionForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (emailInput.value) {
+                showToast(
+                    'Assinatura confirmada! ✊', 
+                    'Você agora faz parte do Movimento ReTec. Em breve enviaremos novidades.',
+                    'fas fa-check-circle',
+                    'success'
+                );
+                emailInput.value = '';
+            }
+        });
+
+        // Copiar modelo de e-mail
+        copyBtn.addEventListener('click', function() {
+            navigator.clipboard.writeText(emailTemplate).then(() => {
+                copyIcon.className = 'fas fa-check mr-2 h-5 w-5';
+                copyText.textContent = 'Copiado!';
+                
+                showToast(
+                    'Modelo copiado! 📧', 
+                    'Cole no seu e-mail e envie para a Câmara Municipal.',
+                    'fas fa-envelope',
+                    'success'
+                );
+                
+                setTimeout(() => {
+                    copyIcon.className = 'fas fa-copy mr-2 h-5 w-5';
+                    copyText.textContent = 'Copiar Modelo';
+                }, 2000);
+            });
+        });
+
+        // Abrir site da Câmara
+        councilorsBtn.addEventListener('click', function() {
+            window.open('https://camara.rj.gov.br/', '_blank');
+        });
+
+        // Compartilhar movimento
+        shareBtn.addEventListener('click', async function() {
+            const shareData = {
+                title: 'Movimento ReTec - Economia Circular Justa',
+                text: 'Junte-se ao movimento por uma cidade mais sustentável! Exija coleta domiciliar de eletrônicos e direitos para os catadores.',
+                url: window.location.href
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    await navigator.clipboard.writeText(window.location.href);
+                    showToast(
+                        'Link copiado! 📋', 
+                        'Compartilhe o movimento nas suas redes sociais.',
+                        'fas fa-share-alt',
+                        'success'
+                    );
+                }
+            } catch (err) {
+                console.log('Erro ao compartilhar:', err);
+            }
+        });
+
+        // Copiar hashtags ao clicar
+        hashtags.forEach(hashtag => {
+            hashtag.addEventListener('click', function() {
+                const hashtagText = this.getAttribute('data-hashtag');
+                navigator.clipboard.writeText(hashtagText);
+                
+                showToast(
+                    'Hashtag copiada!', 
+                    `"${hashtagText}" copiada para a área de transferência.`,
+                    'fas fa-hashtag',
+                    'success'
+                );
             });
         });
     </script>
